@@ -1,2 +1,5 @@
 # VSCode workspace settings:
 .vscode/*
+redis-*/*
+logs/*
+storage/*

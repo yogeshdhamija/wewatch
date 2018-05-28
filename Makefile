@@ -13,6 +13,10 @@ init:
 	pipenv install --dev
 	pipenv check
 
+# Run redis server
+runredis:
+	redis-4.0.9/src/redis-server redis_db_options.conf
+
 # Run server
 runserver:
 ifeq "$(VENV)" "0"
