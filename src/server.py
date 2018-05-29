@@ -7,14 +7,14 @@ from controllers.home import HomeHandler
 
 class Application(tornado.web.Application):
 	def __init__(self, engine, urls, app_settings):
+		self._check_db(engine)
 		self.db = engine
-		self._check_db()
 		tornado.web.Application.__init__(self, urls, **app_settings)
 
-	def _check_db(self):
+	def _check_db(self, engine):
 		"""Checks if a db connection can be made with engine, or prints error and quits."""
 		try:
-			ret = self.db.ping()
+			ret = engine.ping()
 			if(not ret):
 				raise redis.exceptions.ConnectionError
 		except redis.exceptions.ConnectionError:
