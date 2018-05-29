@@ -18,7 +18,7 @@ class Application(tornado.web.Application):
 			if(not ret):
 				raise redis.exceptions.ConnectionError
 		except redis.exceptions.ConnectionError:
-			sys.exit("Could not make a connection to the database. Please check if it is running, and check server_options.conf.")
+			sys.exit("Could not make a connection to the database. Please check if it is running (make runredis), and check server_options.conf.")
 
 
 if __name__ == "__main__":
