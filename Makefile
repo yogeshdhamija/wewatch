@@ -15,14 +15,14 @@ init:
 
 # Run redis server
 runredis:
-	redis-4.0.9/src/redis-server redis_db_options.conf
+	dependencies/redis-4.0.9/src/redis-server redis_db_options.conf
 
 # Run server
 runserver:
 ifeq "$(VENV)" "0"
 	$(error It looks like you don't have a virtual environment. Please run `make init`.)
 endif
-	PYTHONPATH=src/ pipenv run python src/server/server.py
+	PYTHONPATH=src/ pipenv run python src/server.py
 
 # Remove virtualenv
 clean:
