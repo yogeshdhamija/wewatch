@@ -3,18 +3,13 @@ import tornado.ioloop
 import tornado.web
 import redis
 import sys
-from controllers.home import HomeHandler
+from controllers.home import HomeHandler, DevLoginHandler, DevLogoutHandler
 
 class Application(tornado.web.Application):
     def __init__(self, engine, urls, app_settings):
         self._check_db(engine)
         self.db = engine
-        self._initialize_db()
         tornado.web.Application.__init__(self, urls, **app_settings)
-
-    def _initialize_db(self):
-        """Initializes things in the db needed for entities."""
-        self.db.setnx('latest_user_id', 0)
 
     def _check_db(self, engine):
         """Checks if a db connection can be made with engine, or prints error and quits."""
@@ -28,17 +23,22 @@ class Application(tornado.web.Application):
 
 if __name__ == "__main__":
     define("port", default=8888, help="listen on the given port", type=int)
+    define("cookie_secret", default="secret", help="used for tornado's secure cookies", type=str)
     define("redis_host", default="localhost", help="redis server host", type=str)
     define("redis_port", default=6379, help="redis port", type=int)
     define("redis_db", default=0, help="redis db", type=int)
 
-    tornado.options.parse_config_file("server_options.conf")
+    options.parse_config_file("server_options.conf")
 
     urls = [
         (r"/", HomeHandler),
+        (r"/devlogin", DevLoginHandler),
+        (r"/devlogout", DevLogoutHandler),
     ]
 
-    app_settings = {}
+    app_settings = {
+        'cookie_secret': options.cookie_secret
+    }
 
     engine = redis.StrictRedis(host=options.redis_host, port=options.redis_port, db=options.redis_db)
 
