@@ -9,20 +9,27 @@ class BaseHandler(tornado.web.RequestHandler):
     def initialize(self):
         self.user_manager = UserManager(self.db)
 
-    def login(self, id):
-        """ Stores the user's auth as a secure cookie. """
-        self.set_secure_cookie("user_auth", self.user_manager.get(id, "auth"))
+    def store_auth(self, id):
+        """ Stores the user's auth cookie. """
+        auth = self.user_manager.get(id, "auth")
+        if not auth:
+            raise Exception("Failed to store auth cookie. Could not user_manager.get("+str(id)+", '"+str(auth)+"').")
+        self.set_secure_cookie("user_auth", auth)
 
-    def get_current_user(self):
+    def login(self):
         """ Returns the current user's ID using UserManager's consume_auth, and store the new cookie. """
-        if(not self.get_secure_cookie("user_auth")):
+        cookie = self.get_secure_cookie("user_auth")
+        if not cookie:
             return None
-        id = self.user_manager.consume_auth(self.get_secure_cookie("user_auth"))
-        self.login(id)
+        id = self.user_manager.consume_auth(cookie)
+        if not id:
+            return None
+        self.store_auth(id)
         return id
 
     def logout(self):
         """ Deletes the user's stored cookie, after consuming it for good measure. """
-        if(self.get_secure_cookie("user_auth")):
-            self.user_manager.consume_auth(self.get_secure_cookie("user_auth"))
+        cookie = self.get_secure_cookie("user_auth")
+        if(cookie):
+            self.user_manager.consume_auth(cookie)
         self.clear_cookie("user_auth")

@@ -3,7 +3,8 @@ import tornado.ioloop
 import tornado.web
 import redis
 import sys
-from controllers.home import HomeHandler, DevLoginHandler, DevLogoutHandler
+from controllers.home import HomeHandler
+from controllers.logout import LogoutHandler
 
 class Application(tornado.web.Application):
     def __init__(self, engine, urls, app_settings):
@@ -32,8 +33,7 @@ if __name__ == "__main__":
 
     urls = [
         (r"/", HomeHandler),
-        (r"/devlogin", DevLoginHandler),
-        (r"/devlogout", DevLogoutHandler),
+        (r"/logout", LogoutHandler),
     ]
 
     app_settings = {

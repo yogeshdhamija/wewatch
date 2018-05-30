@@ -5,45 +5,59 @@ class UserManager:
     def __init__(self, db):
         self.db = db
         self.db.setnx('latest_user_id', 0)
+        self.seconds_to_expire = 60 * 60 * 24
 
     def create_new(self):
         """ Creates a new user in redis, adds its to the auths hashmap, and returns the id """
 
+        id = [] # used to access id from within the transaction callable
+
         # Add user key with auth cookie
-        # [FUTURE] timed life (since these users are not registered yet)
-        # [FUTURE] pipeline
-        id = self.db.incr("latest_user_id")
-        auth = uuid.uuid4().hex
-        self.db.hmset(
-            'users:' + str(id),
-            {
-                'id': id,
-                'auth': auth
-            }
-        )
+        def create_new_user_transaction(pipe):
+            id.append(pipe.incr("latest_user_id"))
+            auth = uuid.uuid4().hex
+            pipe.hmset(
+                'users:' + str(id[0]),
+                {
+                    'id': id[0],
+                    'auth': auth
+                }
+            )
+            pipe.hset('auths', auth, id[0])
 
-        # Add user to auth map
-        self.db.hset('auths', auth, id)
+        self.db.transaction(create_new_user_transaction, "latest_user_id")
 
-        return id
+        # Give the user timed life
+        self.db.expire('users:' + str(id[0]), self.seconds_to_expire)
+
+        return id[0]
 
     def consume_auth(self, auth):
-        """ Return a user's id, given their auth key. Then change their auth key. """
-        if not auth:
-            raise Exception("Cannot UserManager.consume_auth('" + str(auth) + "')")
+        """ Return a user's id, given their auth key. Then change their auth key.
+        Also, refresh their time to expire if they don't have a username."""
 
-        # [FUTURE] pipeline
+        if not auth:
+            return None
+
         id = self.db.hget('auths', auth)
-        self.db.hdel('auths', auth)
+        if not self.db.exists('users:'+str(id)):
+           return None
+
+        if not self.db.hexists('users:'+str(id), 'username'):
+            self.db.expire('users:'+str(id), self.seconds_to_expire)
+
         new_auth = uuid.uuid4().hex
-        self.db.hset('users:'+str(id), 'auth', new_auth)
-        self.db.hset('auths', new_auth, id)
+        with self.db.pipeline() as pipe:
+            pipe.hdel('auths', auth)
+            pipe.hset('users:'+str(id), 'auth', new_auth)
+            pipe.hset('auths', new_auth, id)
+            pipe.execute()
         return id
 
     def get(self, id, field=None):
         """ Return a field's value of a user, given their ID. If the field is None, then return all fields and values as a dictionary. """
         if not id:
-            raise Exception("Cannot UserManager.get('" + str(id) + "')")
+            return None
         if field:
             return self.db.hget('users:'+str(id), field)
         return self.db.hgetall('users:'+str(id))
