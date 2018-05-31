@@ -1,14 +1,23 @@
+body{
+    background: #cbcbcb45;
+}
+
 #topnav{
     height:250px;
 }
 
 #pgbody{
-    top:-150px;
+    margin-top:-150px;
     z-index:4;
 }
 
-#pgcontent{
+#c1{
     width:100%;
+}
+
+#c2{
+    width:100%;
+    top:50px;
 }
 
 #headertitle{
