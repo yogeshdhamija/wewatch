@@ -1,0 +1,20 @@
+#topnav{
+    height:250px;
+}
+
+#pgbody{
+    top:-150px;
+    z-index:4;
+}
+
+#pgcontent{
+    width:100%;
+}
+
+#headertitle{
+    font-size:40px;
+}
+
+#headercontainer{
+    margin-top:20px;
+}
