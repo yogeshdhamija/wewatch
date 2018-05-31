@@ -7,9 +7,8 @@ class HomeHandler(BaseHandler):
             user_id = self.user_manager.create_new()
             self.store_auth(user_id)
 
-        string = "<pre>" + str(self.user_manager.get(user_id)) + "</pre><br><br><br>"
         args = {
             'title': "We Watch",
-            'user_info_string': string,
+            'user_info_string': str(self.user_manager.get(user_id)),
         }
         self.render("home.html", args=args)
