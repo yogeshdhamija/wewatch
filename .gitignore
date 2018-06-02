@@ -1,14 +1,15 @@
 # VSCode workspace settings:
 .vscode/*
 
-#############################
-# Server side:
-#############################
-
 # No logs or storage:
-server/logs/*
-server/storage/*
+wewatch-server/logs/*
+wewatch-server/storage/*
+
+# No builds:
+wewatch-server/client_build/*
+wewatch-client/dist/*
 
 # We want the READMEs for preserving the directory structure:
-!server/logs/README.md
-!server/storage/README.md
+!wewatch-server/logs/README.md
+!wewatch-server/storage/README.md
+!wewatch-server/client_build/README.md

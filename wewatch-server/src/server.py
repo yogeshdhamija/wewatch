@@ -39,8 +39,8 @@ if __name__ == "__main__":
     app_settings = {
         'cookie_secret': options.cookie_secret,
         'debug': True,
-        'template_path': 'src/views/',
-        'static_path': 'src/views/static/'
+        'template_path': 'client_build/wewatch-client',
+        'static_path': 'client_build/wewatch-client'
     }
 
     engine = redis.StrictRedis(host=options.redis_host, port=options.redis_port, db=options.redis_db)
