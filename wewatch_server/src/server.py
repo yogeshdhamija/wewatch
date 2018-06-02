@@ -39,8 +39,8 @@ if __name__ == "__main__":
     app_settings = {
         'cookie_secret': options.cookie_secret,
         'debug': True,
-        'template_path': 'server/src/views/',
-        'static_path': 'server/src/views/static/'
+        'template_path': 'src/views/',
+        'static_path': 'src/views/static/'
     }
 
     engine = redis.StrictRedis(host=options.redis_host, port=options.redis_port, db=options.redis_db)

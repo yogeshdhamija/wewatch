@@ -1,13 +1,13 @@
 # We Watch
 
 Install development environment:
-`make init`
+`make initserver`
 
 Run server:
 `make runserver`
 
 Delete virtual environment:
-`make clean`
+`make cleanserver`
 
 Run Redis:
 `make runredis`
