@@ -11,7 +11,3 @@ Delete virtual environment:
 
 Run Redis:
 `make runredis`
-
-## Development Info
-
-* Utility functions in `base_handler.py`

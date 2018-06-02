@@ -11,4 +11,5 @@ class HomeHandler(BaseHandler):
             'title': "We Watch",
             'user_info_string': str(self.user_manager.get(user_id)),
         }
-        self.render("home.html", args=args)
+        self.write(args['user_info_string'])
+        # self.render("home.html", args=args)

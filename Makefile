@@ -22,7 +22,7 @@ runserver:
 ifeq "$(VENV)" "0"
 	$(error It looks like you don't have a virtual environment. Please run `make init`.)
 endif
-	PYTHONPATH=src/ pipenv run python src/server.py
+	pipenv run python server/src/server.py
 
 # Remove virtualenv
 clean:
