@@ -29,6 +29,9 @@ ifeq "$(VENV)" "0"
 endif
 	cd wewatch-server && pipenv run python src/server.py
 
+runclient:
+	cd wewatch-client && ng serve
+
 # Remove virtualenv
 cleanserver:
 	cd wewatch-server && pipenv --rm
