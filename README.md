@@ -1,13 +1,12 @@
 # We Watch
 
-Install development environment:
-`make initserver`
+## Dependencies:
+- Redis, included within this repo
+- pipenv
 
-Run server:
-`make runserver`
+## Makefile contains
+- `init`
+- `redis`
+- `run`
+- `clean`
 
-Delete virtual environment:
-`make cleanserver`
-
-Run Redis:
-`make runredis`
