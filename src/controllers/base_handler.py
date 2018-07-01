@@ -9,6 +9,10 @@ class BaseHandler(tornado.web.RequestHandler):
     def initialize(self):
         self.user_manager = UserManager(self.db)
 
+    def render(self, template, title, args = {}):
+        """ Making the render follow our formatting. """
+        super(BaseHandler, self).render(template, title=title, args=args)
+
     def store_auth(self, id):
         """ Stores the user's auth cookie. """
         auth = self.user_manager.get(id, "auth")

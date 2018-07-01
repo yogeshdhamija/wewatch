@@ -3,6 +3,7 @@ import tornado.ioloop
 import tornado.web
 import redis
 import sys
+from frontend.uimodules import uimodules
 from controllers.home import HomeHandler
 from controllers.logout import LogoutHandler
 
@@ -39,8 +40,10 @@ if __name__ == "__main__":
     app_settings = {
         'cookie_secret': options.cookie_secret,
         'debug': True,
-        'template_path': 'frontend/templates',
-        'static_path': 'frontend/static'
+        'ui_modules': uimodules,
+        'xsrf_cookies': True,
+        'template_path': 'src/frontend/templates',
+        'static_path': 'src/frontend/static'
     }
 
     engine = redis.StrictRedis(host=options.redis_host, port=options.redis_port, db=options.redis_db)
