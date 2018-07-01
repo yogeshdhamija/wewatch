@@ -2,14 +2,9 @@
 .vscode/*
 
 # No logs or storage:
-wewatch-server/logs/*
-wewatch-server/storage/*
-
-# No builds:
-wewatch-server/client_build/*
-wewatch-client/dist/*
+logs/*
+storage/*
 
 # We want the READMEs for preserving the directory structure:
-!wewatch-server/logs/README.md
-!wewatch-server/storage/README.md
-!wewatch-server/client_build/README.md
+!logs/README.md
+!storage/README.md
