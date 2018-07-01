@@ -19,7 +19,7 @@ class Application(tornado.web.Application):
             if(not ret):
                 raise redis.exceptions.ConnectionError
         except redis.exceptions.ConnectionError:
-            sys.exit("Could not make a connection to the database. Please check if it is running (make runredis), and check server_options.conf.")
+            sys.exit("Could not make a connection to the database. Please check if it is running (make redis), and check server_options.conf.")
 
 
 if __name__ == "__main__":
@@ -39,8 +39,8 @@ if __name__ == "__main__":
     app_settings = {
         'cookie_secret': options.cookie_secret,
         'debug': True,
-        'template_path': 'client_build/wewatch-client',
-        'static_path': 'client_build/wewatch-client'
+        'template_path': 'frontend/templates',
+        'static_path': 'frontend/static'
     }
 
     engine = redis.StrictRedis(host=options.redis_host, port=options.redis_port, db=options.redis_db)
