@@ -7,7 +7,10 @@ class HomeHandler(BaseHandler):
             user_id = self.user_manager.create_new()
             self.store_auth(user_id)
 
+        user = self.user_manager.get(user_id)
+
         args = {}
-        args["user"] = user_id
+        args["user"] = user
+        args["message"] = self.consume_flash()
 
         self.render("home.html", "Welcome! | WeWatch", args)
