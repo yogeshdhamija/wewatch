@@ -19,4 +19,9 @@ class Alert(BaseUIModule):
             "text" : text,
             "mode" : mode
         }
-        return self.render_module("alert.html", args=args)
+        return self.render_module("alert.html", args)
+
+class NewVideoForm(BaseUIModule):
+    def render(self):
+        args = {}
+        return self.render_module("new_video_form.html", args)

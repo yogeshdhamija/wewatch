@@ -13,8 +13,9 @@
                 {% if args["message"] %}
                     <br>
                     {% module Alert(args["message"]["message"], args["message"]["message_type"]) %}
-                    </br>
                 {% end %}
+                <br>
+                {% module NewVideoForm() %}
             </div>
             <div class="col-md-2">
             </div>

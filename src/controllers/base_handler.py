@@ -8,6 +8,7 @@ class BaseHandler(tornado.web.RequestHandler):
         return self.application.db
 
     def initialize(self):
+        """ Constructor. """
         self.user_manager = UserManager(self.db)
 
     def render(self, template, title, args = {}):
