@@ -4,6 +4,9 @@ body{
 .float_right{
 	float:right;
 }
+.navbar{
+    border:1px solid rgba(0,0,0,.125);
+}
 .btn-primary{
 	cursor:pointer;
 }
