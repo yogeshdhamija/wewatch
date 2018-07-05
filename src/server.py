@@ -6,6 +6,9 @@ import sys
 from frontend.uimodules import uimodules
 from controllers.home import HomeHandler
 from controllers.logout import LogoutHandler
+from controllers.video import NewVideoHandler, WatchHandler
+
+from controllers.dev import DevHandler
 
 class Application(tornado.web.Application):
     def __init__(self, engine, urls, app_settings):
@@ -35,6 +38,10 @@ if __name__ == "__main__":
     urls = [
         (r"/", HomeHandler),
         (r"/logout", LogoutHandler),
+        (r"/add_video", NewVideoHandler),
+        (r"/watch/([0-9]+)", WatchHandler),
+
+        (r"/dev", DevHandler)
     ]
 
     app_settings = {

@@ -10,7 +10,7 @@
 	<div class="alert alert-success" role="alert">
   		{{ args['text'] }}
 	</div>
-{% elif args['mode']=="danger" %}
+{% elif (args['mode']=="danger" or args['mode']=="error") %}
 	<div class="alert alert-danger" role="alert">
   		{{ args['text'] }}
 	</div>

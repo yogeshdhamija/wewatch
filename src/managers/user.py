@@ -5,12 +5,12 @@ class UserManager:
     def __init__(self, db):
         self.db = db
         self.db.setnx('latest_user_id', 0)
-        self.seconds_to_expire = 60 * 60 * 24
+        self.seconds_to_expire = 60 * 60 * 24 * 30
 
     def create_new(self):
         """ Creates a new user in redis, adds its to the auths hashmap, and returns the id """
 
-        id = [] # used to access id from within the transaction callable
+        id = []  # the transaction appends id to this list, since it can access it via reference
 
         # Add user key with auth cookie
         def create_new_user_transaction(pipe):

@@ -1,8 +1,9 @@
 <div class="card text-white bg-light mb-3 new-video-card">
     <div class="card-body">
-        <form method="POST" action="/watch" autocomplete="off">
+        <form method="POST" action="/add_video" autocomplete="off">
+            {% raw xsrf_form_html() %}
             <div class="input-group input-group-lg">
-                <input type="text" autocomplete="off" aria-label="Large" class="form-control" id="inlineFormInputGroup" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+                <input name="video" type="text" autocomplete="off" aria-label="Large" class="form-control" id="inlineFormInputGroup" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
                 <div class="input-group-append">
                     <button type="submit" class="btn btn-primary" type="button">Watch Now!</button>
                 </div>

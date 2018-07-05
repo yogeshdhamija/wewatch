@@ -1,6 +1,7 @@
 import tornado.web
 import base64
 from managers.user import UserManager
+from managers.video import VideoManager
 
 class BaseHandler(tornado.web.RequestHandler):
     @property
@@ -10,6 +11,8 @@ class BaseHandler(tornado.web.RequestHandler):
     def initialize(self):
         """ Constructor. """
         self.user_manager = UserManager(self.db)
+        self.video_manager = VideoManager(self.db)
+        self.user = self.login()
 
     def render(self, template, title, args = {}):
         """ Making the render follow our formatting. """
@@ -48,15 +51,15 @@ class BaseHandler(tornado.web.RequestHandler):
         self.set_secure_cookie("user_auth", auth)
 
     def login(self):
-        """ Returns the current user's ID using UserManager's consume_auth, and store the new cookie. """
+        """ Returns the current user's data using UserManager's consume_auth, and store the new cookie.
+            If the current user doesn't exist, one is created. """
         cookie = self.get_secure_cookie("user_auth")
-        if not cookie:
-            return None
-        id = self.user_manager.consume_auth(cookie)
-        if not id:
-            return None
-        self.store_auth(id)
-        return id
+        if cookie:
+            user_id = self.user_manager.consume_auth(cookie)
+        if (not cookie) or (not user_id):
+            user_id = self.user_manager.create_new()
+        self.store_auth(user_id)
+        return self.user_manager.get(user_id)
 
     def logout(self):
         """ Deletes the user's stored cookie, after consuming it for good measure. """
@@ -64,3 +67,7 @@ class BaseHandler(tornado.web.RequestHandler):
         if(cookie):
             self.user_manager.consume_auth(cookie)
         self.clear_cookie("user_auth")
+
+    def check_argument(self, argument):
+        "Utility method to check if argument exists and isn't blank."
+        return ((argument in self.request.arguments) and (self.get_argument(argument) != ''))

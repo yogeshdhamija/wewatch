@@ -2,15 +2,8 @@ from base_handler import BaseHandler
 
 class HomeHandler(BaseHandler):
     def get(self):
-        user_id = self.login()
-        if not user_id:
-            user_id = self.user_manager.create_new()
-            self.store_auth(user_id)
-
-        user = self.user_manager.get(user_id)
-
         args = {}
-        args["user"] = user
+        args["user"] = self.user
         args["message"] = self.consume_flash()
 
         self.render("home.html", "Welcome! | WeWatch", args)
