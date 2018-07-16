@@ -1,7 +1,6 @@
 # We Watch
 
 ## Dependencies:
-- Redis, included within this repo
 - pipenv
 
 ## Makefile contains

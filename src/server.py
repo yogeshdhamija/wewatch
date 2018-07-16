@@ -6,7 +6,7 @@ import sys
 from frontend.uimodules import uimodules
 from controllers.home import HomeHandler
 from controllers.logout import LogoutHandler
-from controllers.video import NewVideoHandler, WatchHandler
+from controllers.video import NewVideoHandler, WatchHandler, WatchingWSHandler
 
 from controllers.dev import DevHandler
 
@@ -40,6 +40,7 @@ if __name__ == "__main__":
         (r"/logout", LogoutHandler),
         (r"/add_video", NewVideoHandler),
         (r"/watch/([0-9]+)", WatchHandler),
+        (r"/watching_websocket", WatchingWSHandler),
 
         (r"/dev", DevHandler)
     ]

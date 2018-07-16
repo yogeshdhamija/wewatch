@@ -1,6 +1,7 @@
-from base_handler import BaseHandler
+from base_handler import BaseHandler, BaseWSHandler
 from tornado.web import HTTPError
 import base64
+import json
 
 class NewVideoHandler(BaseHandler):
     def post(self):
@@ -26,9 +27,28 @@ class WatchHandler(BaseHandler):
         args["user"] = self.user
         args["message"] = self.consume_flash()
         args["video"] = self.video_manager.get(video_id)
+        args["websocket_url"] = "ws://" + self.request.host + "/watching_websocket"
 
         self.render("watching.html", "Watching... | WeWatch", args)
 
     def _is_user_watching_video(self, video_id):
         """ Helper to determine if video_id exists in watching:[USERID]. """
         return video_id in self.video_manager.watching(self.user["id"])
+
+class WatchingWSHandler(BaseWSHandler):
+    def open(self):
+        self.phase = "AUTH"
+
+    def on_message(self, message):
+        parsed_message = json.loads(message)
+        if self.phase == "AUTH":
+            if any([
+                "user_id" not in parsed_message,
+                "user_auth" not in parsed_message,
+                "video_id" not in parsed_message
+            ]):
+                self.write_message("ERROR: bad AUTH")
+                self.close()
+
+    def on_close(self):
+        print("WebSocket closed")

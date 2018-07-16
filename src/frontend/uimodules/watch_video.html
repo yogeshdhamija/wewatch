@@ -1,4 +1,5 @@
 <div id="player"></div>
+
 <script>
     function youtube_parser(url){
         var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
@@ -23,6 +24,27 @@
             }
         });
     }
+
+    var ws = new WebSocket("{{ args['ws_url'] }}");
+    var phase = "AUTH";
+
+    ws.onopen = function() {
+        var signed_auth = getCookie("user_auth");
+        var raw_auth = parseSignedCookie(signed_auth);
+        var to_send = new Object();
+        to_send.user_id = "{{ args['user']['id'] }}";
+        to_send.user_auth = raw_auth;
+        to_send.video_id = "{{ args['id'] }}";
+        to_send_string = JSON.stringify(to_send);
+        console.log("SENDING: " + to_send_string);
+        ws.send(to_send_string);
+    };
+
+    ws.onmessage = function (evt) {
+        if(phase = "AUTH"){
+            console.log(evt.data);
+        }
+    };
 
     function onPlayerReady(event) {
         event.target.playVideo();

@@ -1,9 +1,24 @@
-import tornado.web
+from tornado.web import RequestHandler
+from tornado.websocket import WebSocketHandler
 import base64
 from managers.user import UserManager
 from managers.video import VideoManager
 
-class BaseHandler(tornado.web.RequestHandler):
+class BaseWSHandler(WebSocketHandler):
+    @property
+    def db(self):
+        return self.application.db
+
+    def initialize(self):
+        """ Constructor. """
+        self.user_manager = UserManager(self.db)
+        self.video_manager = VideoManager(self.db)
+
+    def check_user(self, id, auth):
+        """ Given an id and auth, checks if the auth matches the id. """
+        return self.user_manager.check_auth(id, auth)
+
+class BaseHandler(RequestHandler):
     @property
     def db(self):
         return self.application.db

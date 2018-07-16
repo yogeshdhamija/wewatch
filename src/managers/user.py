@@ -32,6 +32,22 @@ class UserManager:
 
         return id[0]
 
+    def check_auth(self, id, auth):
+        """ Returns true if the auth matches the ID. """
+
+        if (not auth) or (not id):
+            return False
+
+        if not self.db.exists("users:"+str(id)):
+            return False
+
+        id_from_db = self.db.hget('auths', auth)
+
+        if (not id_from_db):
+            return False
+
+        return id == id_from_db
+
     def consume_auth(self, auth):
         """ Return a user's id, given their auth key. Then change their auth key.
         Also, refresh their time to expire if they don't have a username."""
