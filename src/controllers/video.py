@@ -27,6 +27,10 @@ class WatchHandler(BaseHandler):
         args["user"] = self.user
         args["message"] = self.consume_flash()
         args["video"] = self.video_manager.get(video_id)
+
+        # [TODO] Implement:
+        args["invite_key"] = "PLACEHOLDER"
+
         args["websocket_url"] = "ws://" + self.request.host + "/watching_websocket"
 
         self.render("watching.html", "Watching... | WeWatch", args)
@@ -39,16 +43,31 @@ class WatchingWSHandler(BaseWSHandler):
     def open(self):
         self.phase = "AUTH"
 
+    def _authenticate(self, msg):
+        if any([
+            "user_id" not in msg,
+            "user_auth" not in msg,
+            "video_id" not in msg,
+            "invite_key" not in msg,
+            not self.check_user(msg["user_id"], msg["user_auth"])
+        ]):
+            self.close(1008, "Bad Authentication.")
+
+        # [TODO] Check if user has rights to the video: either JSON "invite_key" must point to video, or user must own video.
+
+
     def on_message(self, message):
-        parsed_message = json.loads(message)
+        parsed_message = False
+
+        try:
+            parsed_message = json.loads(message)
+        except:
+            self.close(1008, "Bad message. Could not parse JSON.")
+
         if self.phase == "AUTH":
-            if any([
-                "user_id" not in parsed_message,
-                "user_auth" not in parsed_message,
-                "video_id" not in parsed_message
-            ]):
-                self.write_message("ERROR: bad AUTH")
-                self.close()
+            self._authenticate(parsed_message)
+
+
 
     def on_close(self):
         print("WebSocket closed")

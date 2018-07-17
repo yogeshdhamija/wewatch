@@ -1,9 +1,10 @@
 import uuid
+from base_manager import BaseManager
 
 
-class UserManager:
+class UserManager(BaseManager):
     def __init__(self, db):
-        self.db = db
+        super(UserManager, self).__init__(db)
         self.db.setnx('latest_user_id', 0)
         self.seconds_to_expire = 60 * 60 * 24 * 30
 
@@ -38,7 +39,7 @@ class UserManager:
         if (not auth) or (not id):
             return False
 
-        if not self.db.exists("users:"+str(id)):
+        if not self.db.exists("users:"+str(int(id))):
             return False
 
         id_from_db = self.db.hget('auths', auth)
@@ -74,6 +75,8 @@ class UserManager:
         """ Return a field's value of a user, given their ID. If the field is None, then return all fields and values as a dictionary. """
         if not id:
             return None
+
         if field:
-            return self.db.hget('users:'+str(id), field)
-        return self.db.hgetall('users:'+str(id))
+            return self.db.hget('users:'+str(int(id)), field)
+
+        return self.db.hgetall('users:'+str(int(id)))

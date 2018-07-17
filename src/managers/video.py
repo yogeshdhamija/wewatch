@@ -1,8 +1,10 @@
 import time
+from base_manager import BaseManager
 
-class VideoManager:
+
+class VideoManager(BaseManager):
     def __init__(self, db):
-        self.db = db
+        super(VideoManager, self).__init__(db)
         self.db.setnx('latest_video_id', 0)
         self.seconds_to_expire = 60 * 60 * 24 * 30
 
@@ -21,11 +23,11 @@ class VideoManager:
                 {
                     'id': id[0],
                     'link': link,
-                    'owner': user_id,
+                    'owner': int(user_id),
                     'time': 0
                 }
             )
-            pipe.zadd('watching:'+str(user_id), time.time(), id[0])
+            pipe.zadd('watching:'+str(int(user_id)), time.time(), id[0])
 
         self.db.transaction(create_new_video_transaction, "latest_video_id")
 
@@ -39,18 +41,18 @@ class VideoManager:
         if not id:
             return None
         if field:
-            return self.db.hget('videos:'+str(id), field)
-        return self.db.hgetall('videos:'+str(id))
+            return self.db.hget('videos:'+str(int(id)), field)
+        return self.db.hgetall('videos:'+str(int(id)))
 
     def watching(self, user_id):
         """ Get video_ids of everything user_id is watching, ordered descending by timestamp. """
-        return self.db.zrevrange('watching:'+str(user_id), 0, -1)
+        return self.db.zrevrange('watching:'+str(int(user_id)), 0, -1)
 
     def update_watching(self, id):
         """ Updates the watching score for the video, as well as its timed life. Does not return."""
         self.db.zadd(
             'watching:'+str(self.get(id, 'owner')),
             time.time(),
-            id
+            int(id)
         )
-        self.db.expire('videos:'+str(id), self.seconds_to_expire)
+        self.db.expire('videos:'+str(int(id)), self.seconds_to_expire)

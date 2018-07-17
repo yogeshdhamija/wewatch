@@ -28,11 +28,12 @@ class NewVideoForm(BaseUIModule):
         return self.render_module("new_video_form.html", args)
 
 class Watch(BaseUIModule):
-    def render(self, video, ws_url, user):
+    def render(self, video, invite_key, websocket_url, user):
         args = {
             "id" : video["id"],
             "link" : base64.b64decode(video["link"]),
-            "ws_url" : ws_url,
+            "invite_key": invite_key,
+            "ws_url" : websocket_url,
             "user" : user
         }
         return self.render_module("watch_video.html", args)

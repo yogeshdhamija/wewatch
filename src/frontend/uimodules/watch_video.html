@@ -1,4 +1,5 @@
 <div id="player"></div>
+<div id="js_alert_container">{% module Alert("", "info") %}</div>
 
 <script>
     function youtube_parser(url){
@@ -30,15 +31,25 @@
 
     ws.onopen = function() {
         var signed_auth = getCookie("user_auth");
-        var raw_auth = parseSignedCookie(signed_auth);
+        var raw_auth = parseTornadoSignedCookie(signed_auth);
+
         var to_send = new Object();
         to_send.user_id = "{{ args['user']['id'] }}";
         to_send.user_auth = raw_auth;
         to_send.video_id = "{{ args['id'] }}";
+        to_send.invite_key = "{{ args['invite_key'] }}";
         to_send_string = JSON.stringify(to_send);
-        console.log("SENDING: " + to_send_string);
         ws.send(to_send_string);
+
+        console.log("SENDING: " + to_send_string);
     };
+
+    ws.onclose = function(evt){
+        console.log("Websocket closed! Reason:")
+        console.log(evt);
+
+        $("#js_alert_container").find('.alert').html("Websocket closed! Reason:<br/><br/>" + evt.reason);
+    }
 
     ws.onmessage = function (evt) {
         if(phase = "AUTH"){
