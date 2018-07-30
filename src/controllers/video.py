@@ -16,6 +16,23 @@ class NewVideoHandler(BaseHandler):
 
         self.redirect("/watch/"+str(video_id))
 
+class JoinHandler(BaseHandler):
+    def get(self, invite):
+        video_id = self.video_manager.get_video_from_invite(invite)
+        if not video_id:
+            raise HTTPError(404)
+
+        args = {}
+        args["user"] = self.user
+        args["message"] = self.consume_flash()
+        args["video_id"] = self.video_manager.get(video_id, "id")
+        args["video_link"] = self.video_manager.get(video_id, "link")
+        args["invite"] = self.video_manager.get(video_id, "invite_key")
+
+        args["websocket_url"] = "ws://" + self.request.host + "/watching_websocket"
+
+        self.render("watching.html", "Watching... | WeWatch", args)
+
 class WatchHandler(BaseHandler):
     def get(self, video_id):
         if not self._is_user_watching_video(video_id):
@@ -26,10 +43,9 @@ class WatchHandler(BaseHandler):
         args = {}
         args["user"] = self.user
         args["message"] = self.consume_flash()
-        args["video"] = self.video_manager.get(video_id)
-
-        # [TODO] Implement:
-        args["invite_key"] = "PLACEHOLDER"
+        args["video_id"] = self.video_manager.get(video_id, "id")
+        args["video_link"] = self.video_manager.get(video_id, "link")
+        args["invite"] = self.video_manager.get(video_id, "invite_key")
 
         args["websocket_url"] = "ws://" + self.request.host + "/watching_websocket"
 
@@ -42,6 +58,9 @@ class WatchHandler(BaseHandler):
 class WatchingWSHandler(BaseWSHandler):
     def open(self):
         self.phase = "AUTH"
+        self.id = None
+        self.time = None
+        self.state = None
 
     def _authenticate(self, msg):
         if any([
@@ -53,8 +72,47 @@ class WatchingWSHandler(BaseWSHandler):
         ]):
             self.close(1008, "Bad Authentication.")
 
-        # [TODO] Check if user has rights to the video: either JSON "invite_key" must point to video, or user must own video.
+        if all([
+            int(msg["video_id"]) not in self.video_manager.watching(msg["user_id"]),
+            msg["video_id"] != self.video_manager.get_video_from_invite(msg["invite_key"])
+        ]):
+            self.close(1008, "Bad Authentication.")
 
+        self.id = msg["video_id"]
+
+        others = self.get_connections(self.id)
+        if others:
+            self.time = others[0].time
+            self.state = others[0].state
+
+        self.add_connection(self.id, self)
+        self.phase = "WATCHING"
+
+        self.write_message(json.dumps({
+            "time": self.time,
+            "state": self.state
+        }))
+
+    def _update(self, msg):
+        update = False
+        if "time" in msg and "state" in msg:
+            if self.time is None or self.state is None:
+                update = True
+            else:
+                if any([
+                    abs(msg["time"] - self.time) > 0.5,
+                    msg["state"] != self.state
+                ]):
+                    update = True
+        if update:
+            self.time = msg["time"]
+            self.state = msg["state"]
+            for ws in self.get_connections(self.id):
+                if ws.phase == "WATCHING":
+                    ws.write_message(json.dumps({
+                        "time": self.time,
+                        "state": self.state
+                    }))
 
     def on_message(self, message):
         parsed_message = False
@@ -66,8 +124,8 @@ class WatchingWSHandler(BaseWSHandler):
 
         if self.phase == "AUTH":
             self._authenticate(parsed_message)
-
-
+        if self.phase == "WATCHING":
+            self._update(parsed_message)
 
     def on_close(self):
-        print("WebSocket closed")
+        self.remove_connection(self.id, self)

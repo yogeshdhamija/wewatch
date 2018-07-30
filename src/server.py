@@ -6,9 +6,12 @@ import sys
 from frontend.uimodules import uimodules
 from controllers.home import HomeHandler
 from controllers.logout import LogoutHandler
-from controllers.video import NewVideoHandler, WatchHandler, WatchingWSHandler
-
-from controllers.dev import DevHandler
+from controllers.video import (
+    NewVideoHandler,
+    WatchHandler,
+    JoinHandler,
+    WatchingWSHandler
+)
 
 class Application(tornado.web.Application):
     def __init__(self, engine, urls, app_settings):
@@ -23,7 +26,7 @@ class Application(tornado.web.Application):
             if(not ret):
                 raise redis.exceptions.ConnectionError
         except redis.exceptions.ConnectionError:
-            sys.exit("Could not make a connection to the database. Please check if it is running (make redis), and check server_options.conf.")
+            sys.exit("Could not make a connection to Redis. Please check if it is running, and check server_options.conf.")
 
 
 if __name__ == "__main__":
@@ -40,9 +43,8 @@ if __name__ == "__main__":
         (r"/logout", LogoutHandler),
         (r"/add_video", NewVideoHandler),
         (r"/watch/([0-9]+)", WatchHandler),
+        (r"/join/(.+)", JoinHandler),
         (r"/watching_websocket", WatchingWSHandler),
-
-        (r"/dev", DevHandler)
     ]
 
     app_settings = {

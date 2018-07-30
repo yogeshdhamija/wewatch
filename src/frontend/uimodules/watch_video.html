@@ -1,12 +1,14 @@
 <div id="player"></div>
 <div id="js_alert_container">{% module Alert("", "info") %}</div>
+<br />
+Invite link:<br />
+<span id="invite_url"></span>
+<br />
+<br />
 
 <script>
-    function youtube_parser(url){
-        var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
-        var match = url.match(regExp);
-        return (match&&match[7].length==11)? match[7] : false;
-    }
+
+    var phase = "AUTH";
 
     var tag = document.createElement('script');
 
@@ -26,42 +28,95 @@
         });
     }
 
-    var ws = new WebSocket("{{ args['ws_url'] }}");
-    var phase = "AUTH";
+    $(document).ready(function(){
+        var port = location.port ? ':'+location.port : ""
+        $("#invite_url").text("http://"+window.location.hostname + port + "/join/{{ args['invite_key'] }}");
+    });
 
-    ws.onopen = function() {
-        var signed_auth = getCookie("user_auth");
-        var raw_auth = parseTornadoSignedCookie(signed_auth);
-
-        var to_send = new Object();
-        to_send.user_id = "{{ args['user']['id'] }}";
-        to_send.user_auth = raw_auth;
-        to_send.video_id = "{{ args['id'] }}";
-        to_send.invite_key = "{{ args['invite_key'] }}";
-        to_send_string = JSON.stringify(to_send);
-        ws.send(to_send_string);
-
-        console.log("SENDING: " + to_send_string);
-    };
-
-    ws.onclose = function(evt){
-        console.log("Websocket closed! Reason:")
-        console.log(evt);
-
-        $("#js_alert_container").find('.alert').html("Websocket closed! Reason:<br/><br/>" + evt.reason);
+    function show_update(content){
+        $("#js_alert_container").find('.alert').html(content);
     }
 
-    ws.onmessage = function (evt) {
-        if(phase = "AUTH"){
-            console.log(evt.data);
+    function update(data){
+        parsed_data = JSON.parse(data);
+        state = parsed_data.state;
+        time = parsed_data.time;
+        if(Math.abs(time - player.getCurrentTime()) > 0.5){
+            player.seekTo(time, true);
         }
-    };
+        if(state != player.getPlayerState()){
+            if(state == 1){
+                player.playVideo();
+            }
+            else{
+                player.pauseVideo();
+            }
+        }
+    }
+
+    function auth_rec(data){
+        parsed_data = JSON.parse(data);
+        if (!('state' in parsed_data) || (!('time' in parsed_data))){
+            show_update("Could not connect. Please refresh.");
+            phase = "CLOSED";
+        }
+        else{
+            state = parsed_data.state;
+            time = parsed_data.time;
+            update(data);
+            phase = "WATCHING";
+            setTimeout(function(){
+                setInterval(send_update, 100)
+            }, 1000);
+        }
+    }
+
+    function send_update(){
+        if(phase == "WATCHING"){
+            var to_send = new Object()
+            to_send.state = player.getPlayerState();
+            to_send.time = player.getCurrentTime();
+            to_send_string = JSON.stringify(to_send);
+            ws.send(to_send_string);
+        }
+    }
 
     function onPlayerReady(event) {
-        event.target.playVideo();
+        ws = new WebSocket("{{ args['ws_url'] }}");
+
+        ws.onopen = function() {
+            show_update("Connecting...");
+            var signed_auth = getCookie("user_auth");
+            var raw_auth = parseTornadoSignedCookie(signed_auth);
+
+            var to_send = new Object();
+            to_send.user_id = "{{ args['user']['id'] }}";
+            to_send.user_auth = raw_auth;
+            to_send.video_id = "{{ args['id'] }}";
+            to_send.invite_key = "{{ args['invite_key'] }}";
+            to_send_string = JSON.stringify(to_send);
+            ws.send(to_send_string);
+        };
+
+        ws.onclose = function(evt){
+            phase = "CLOSED";
+            console.log("Websocket closed! Reason:");
+            console.log(evt);
+            show_update("Websocket closed! Reason:<br/><br/>" + evt.reason);
+        }
+
+        ws.onmessage = function (evt) {
+            if(phase == "AUTH"){
+                auth_rec(evt.data);
+                show_update("Connected!");
+            }
+            if(phase == "WATCHING"){
+                update(evt.data);
+            }
+        };
     }
 
     function onPlayerStateChange(event) {
-        console.log("onPlayerStateChange");
+        send_update();
     }
 </script>

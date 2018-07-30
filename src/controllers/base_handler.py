@@ -9,6 +9,26 @@ class BaseWSHandler(WebSocketHandler):
     def db(self):
         return self.application.db
 
+    CONNECTIONS_BY_VIDEO_ID = {}
+
+    def add_connection(self, video_id, connection):
+        """ Add connection to global manager """
+        if not video_id in self.CONNECTIONS_BY_VIDEO_ID:
+            self.CONNECTIONS_BY_VIDEO_ID[video_id] = []
+        self.CONNECTIONS_BY_VIDEO_ID[video_id].append(connection)
+
+    def remove_connection(self, video_id, connection):
+        """ Remove connection from global manager """
+        if not video_id in self.CONNECTIONS_BY_VIDEO_ID:
+            self.CONNECTIONS_BY_VIDEO_ID[video_id] = []
+        self.CONNECTIONS_BY_VIDEO_ID[video_id].remove(connection)
+
+    def get_connections(self, video_id):
+        """ Gets all connections from global manager """
+        if not video_id in self.CONNECTIONS_BY_VIDEO_ID:
+            self.CONNECTIONS_BY_VIDEO_ID[video_id] = []
+        return self.CONNECTIONS_BY_VIDEO_ID[video_id]
+
     def initialize(self):
         """ Constructor. """
         self.user_manager = UserManager(self.db)

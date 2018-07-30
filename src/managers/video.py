@@ -1,4 +1,5 @@
 import time
+import uuid
 from base_manager import BaseManager
 
 
@@ -18,16 +19,19 @@ class VideoManager(BaseManager):
         # Add video and append its ID and current timestamp to watching sset
         def create_new_video_transaction(pipe):
             id.append(pipe.incr("latest_video_id"))
+            invite = uuid.uuid4().bytes.encode("base64").rstrip("=\n").replace('/','_')
             pipe.hmset(
                 'videos:' + str(id[0]),
                 {
                     'id': id[0],
                     'link': link,
                     'owner': int(user_id),
-                    'time': 0
+                    'time': 0,
+                    'invite_key': invite
                 }
             )
             pipe.zadd('watching:'+str(int(user_id)), time.time(), id[0])
+            pipe.hset('invites', invite, id[0])
 
         self.db.transaction(create_new_video_transaction, "latest_video_id")
 
@@ -56,3 +60,12 @@ class VideoManager(BaseManager):
             int(id)
         )
         self.db.expire('videos:'+str(int(id)), self.seconds_to_expire)
+
+    def get_video_from_invite(self, key):
+        """ Gets video id from invite key, or returns None. """
+        if not key:
+            return None
+        id = self.db.hget('invites', key)
+        if not self.db.exists('videos:'+str(id)):
+           return None
+        return id

@@ -43,3 +43,7 @@ body{
 .new-video-card{
     width:100%;
 }
+#invite_url{
+    color: black;
+    font-weight: bold;
+}
