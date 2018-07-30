@@ -1,0 +1,24 @@
+{% extends "base_template.html" %}
+
+{% block title %}{{ title }}{% end %}
+
+{% block body %}
+    {% module Navbar( args["user"]["name"] if 'name' in args["user"] else None ) %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-8">
+                {% if args["message"] %}
+                    <br>
+                    {% module Alert(args["message"]["message"], args["message"]["message_type"]) %}
+                {% end %}
+                <br>
+                {% module NewVideoForm() %}
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+    </div>
+{% end %}

@@ -1,25 +1,20 @@
-ifndef VERBOSE
-MAKEFLAGS += --no-print-directory
-endif
-
 # Settings:
-REPO_NAME := wewatch
+NAME := wewatch
 
 # VENV is 1 if virtualenv exists, otherwise 0:
-VENV := $(shell pipenv --venv 2>&1 | if grep "$(REPO_NAME)" > /dev/null; then echo '1'; else echo '0'; fi;)
+VENV := $(shell pipenv --venv 2>&1 | if grep "$(NAME)" > /dev/null; then echo '1'; else echo '0'; fi;)
 
-# Init dev environment
 init:
-	pipenv install --dev
-	pipenv check
+	pipenv install --dev && pipenv check
 
-# Run server
-runserver:
+redis:
+	dependencies/redis-4.0.9/src/redis-server redis_db_options.conf
+
+run:
 ifeq "$(VENV)" "0"
-	$(error It looks like you don't have a virtual environment. Please run `make init`.)
+	$(error It looks like you don't have a virtual environment. Please run `make initserver`.)
 endif
-	PYTHONPATH=src/ pipenv run python src/server/server.py
+	pipenv run python src/server.py
 
-# Remove virtualenv
 clean:
 	pipenv --rm

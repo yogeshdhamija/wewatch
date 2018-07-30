@@ -1,2 +1,10 @@
 # VSCode workspace settings:
 .vscode/*
+
+# No logs or storage:
+logs/*
+storage/*
+
+# We want the READMEs for preserving the directory structure:
+!logs/README.md
+!storage/README.md
