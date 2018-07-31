@@ -8,7 +8,7 @@ init:
 	pipenv install --dev && pipenv check
 
 redis:
-	dependencies/redis-4.1.0/src/redis-server redis_db_options.conf
+	dependencies/redis-4.0.10/src/redis-server redis_db_options.conf
 
 run:
 ifeq "$(VENV)" "0"
