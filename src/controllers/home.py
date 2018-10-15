@@ -1,4 +1,5 @@
-from base_handler import BaseHandler
+from controllers.base_handler import BaseHandler
+
 
 class HomeHandler(BaseHandler):
     def get(self):

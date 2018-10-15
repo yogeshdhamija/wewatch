@@ -1,6 +1,6 @@
 import time
 import uuid
-from base_manager import BaseManager
+from managers.base_manager import BaseManager
 
 
 class VideoManager(BaseManager):

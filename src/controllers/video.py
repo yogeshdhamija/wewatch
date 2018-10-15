@@ -1,7 +1,8 @@
-from base_handler import BaseHandler, BaseWSHandler
+from controllers.base_handler import BaseHandler, BaseWSHandler
 from tornado.web import HTTPError
 import base64
 import json
+
 
 class NewVideoHandler(BaseHandler):
     def post(self):
@@ -15,6 +16,7 @@ class NewVideoHandler(BaseHandler):
         )
 
         self.redirect("/watch/"+str(video_id))
+
 
 class JoinHandler(BaseHandler):
     def get(self, invite):
@@ -32,6 +34,7 @@ class JoinHandler(BaseHandler):
         args["websocket_url"] = "ws://" + self.request.host + "/watching_websocket"
 
         self.render("watching.html", "Watching... | WeWatch", args)
+
 
 class WatchHandler(BaseHandler):
     def get(self, video_id):
@@ -54,6 +57,7 @@ class WatchHandler(BaseHandler):
     def _is_user_watching_video(self, video_id):
         """ Helper to determine if video_id exists in watching:[USERID]. """
         return video_id in self.video_manager.watching(self.user["id"])
+
 
 class WatchingWSHandler(BaseWSHandler):
     def open(self):

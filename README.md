@@ -1,5 +1,10 @@
 # We Watch
 
+## Setup Steps:
+ - `make init`
+ - `make redis` (will hijack termnial)
+ - `make run`
+
 ## What is it?
 The idea is simple: watch videos together over the internet.
 

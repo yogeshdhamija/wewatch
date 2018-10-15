@@ -36,7 +36,7 @@ if __name__ == "__main__":
     define("redis_port", default=6379, help="redis port", type=int)
     define("redis_db", default=0, help="redis db", type=int)
 
-    options.parse_config_file("server_options.conf")
+    options.parse_config_file("../server_options.conf")
 
     urls = [
         (r"/", HomeHandler),
@@ -52,8 +52,8 @@ if __name__ == "__main__":
         'debug': True,
         'ui_modules': uimodules,
         'xsrf_cookies': True,
-        'template_path': 'src/frontend/templates',
-        'static_path': 'src/frontend/static'
+        'template_path': 'frontend/templates',
+        'static_path': 'frontend/static'
     }
 
     engine = redis.StrictRedis(host=options.redis_host, port=options.redis_port, db=options.redis_db)

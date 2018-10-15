@@ -15,6 +15,3 @@ six = "*"
 singledispatch = "*"
 redis = "*"
 hiredis = "*"
-
-[requires]
-python_version = "2.7"
