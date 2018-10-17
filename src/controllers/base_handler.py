@@ -4,6 +4,7 @@ import base64
 from managers.user import UserManager
 from managers.video import VideoManager
 
+
 class BaseWSHandler(WebSocketHandler):
     @property
     def db(self):
@@ -13,19 +14,19 @@ class BaseWSHandler(WebSocketHandler):
 
     def add_connection(self, video_id, connection):
         """ Add connection to global manager """
-        if not video_id in self.CONNECTIONS_BY_VIDEO_ID:
+        if video_id not in self.CONNECTIONS_BY_VIDEO_ID:
             self.CONNECTIONS_BY_VIDEO_ID[video_id] = []
         self.CONNECTIONS_BY_VIDEO_ID[video_id].append(connection)
 
     def remove_connection(self, video_id, connection):
         """ Remove connection from global manager """
-        if not video_id in self.CONNECTIONS_BY_VIDEO_ID:
+        if video_id not in self.CONNECTIONS_BY_VIDEO_ID:
             self.CONNECTIONS_BY_VIDEO_ID[video_id] = []
         self.CONNECTIONS_BY_VIDEO_ID[video_id].remove(connection)
 
     def get_connections(self, video_id):
         """ Gets all connections from global manager """
-        if not video_id in self.CONNECTIONS_BY_VIDEO_ID:
+        if video_id not in self.CONNECTIONS_BY_VIDEO_ID:
             self.CONNECTIONS_BY_VIDEO_ID[video_id] = []
         return self.CONNECTIONS_BY_VIDEO_ID[video_id]
 
@@ -38,6 +39,7 @@ class BaseWSHandler(WebSocketHandler):
         """ Given an id and auth, checks if the auth matches the id. """
         return self.user_manager.check_auth(id, auth)
 
+
 class BaseHandler(RequestHandler):
     @property
     def db(self):
@@ -49,11 +51,11 @@ class BaseHandler(RequestHandler):
         self.video_manager = VideoManager(self.db)
         self.user = self.login()
 
-    def render(self, template, title, args = {}):
+    def render(self, template, title, args={}):
         """ Making the render follow our formatting. """
         super(BaseHandler, self).render(template, title=title, args=args)
 
-    def flash(self, message, m_type = "info"):
+    def flash(self, message, m_type="info"):
         """ Stores a "flash" cookie with a message and message type to be
             destroyed upon consumption. """
         self.set_secure_cookie("message", base64.encodestring(message))

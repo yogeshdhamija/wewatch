@@ -14,12 +14,12 @@ class VideoManager(BaseManager):
         appends it to the 'watching:[USERID]' sorted set,
         and returns the id. """
 
-        id = [] # the transaction appends id to this list, since it can access it via reference
+        id = []  # the transaction appends id to this list, since it can access it via reference
 
         # Add video and append its ID and current timestamp to watching sset
         def create_new_video_transaction(pipe):
             id.append(pipe.incr("latest_video_id"))
-            invite = uuid.uuid4().bytes.encode("base64").rstrip("=\n").replace('/','_')
+            invite = uuid.uuid4().bytes.encode("base64").rstrip("=\n").replace('/', '_')
             pipe.hmset(
                 'videos:' + str(id[0]),
                 {
@@ -67,5 +67,5 @@ class VideoManager(BaseManager):
             return None
         id = self.db.hget('invites', key)
         if not self.db.exists('videos:'+str(id)):
-           return None
+            return None
         return id

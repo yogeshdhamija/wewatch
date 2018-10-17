@@ -123,7 +123,8 @@ class WatchingWSHandler(BaseWSHandler):
 
         try:
             parsed_message = json.loads(message)
-        except:
+        except Exception:
+            # TODO: Catch error properly
             self.close(1008, "Bad message. Could not parse JSON.")
 
         if self.phase == "AUTH":

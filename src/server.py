@@ -13,6 +13,7 @@ from controllers.video import (
     WatchingWSHandler
 )
 
+
 class Application(tornado.web.Application):
     def __init__(self, engine, urls, app_settings):
         self._check_db(engine)

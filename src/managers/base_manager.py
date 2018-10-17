@@ -5,6 +5,6 @@ class BaseManager(object):
     def check_type(self, inpt, typ):
         return isinstance(inpt, typ)
 
-    def check_type_or_raise(self, inpt, typ, message = "Wrong Type"):
+    def check_type_or_raise(self, inpt, typ, message="Wrong Type"):
         if not self.check_type(inpt, typ):
             raise TypeError(message)

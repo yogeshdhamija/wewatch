@@ -58,7 +58,7 @@ class UserManager(BaseManager):
 
         id = self.db.hget('auths', auth)
         if not self.db.exists('users:'+str(id)):
-           return None
+            return None
 
         if not self.db.hexists('users:'+str(id), 'username'):
             self.db.expire('users:'+str(id), self.seconds_to_expire)
