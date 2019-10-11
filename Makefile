@@ -6,7 +6,7 @@ REDIS_SERVER_EXECUTABLE := redis-server
 VENV := $(shell pipenv --venv 2>&1 | if grep "$(NAME)" > /dev/null; then echo '1'; else echo '0'; fi;)
 
 init:
-	pipenv --python=2.7
+	pipenv --python=3
 	pipenv install --dev && pipenv check
 
 redis:
